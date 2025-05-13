@@ -1,0 +1,64 @@
+.prediction-bg {
+  width: 100%;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.prediction-form-container {
+  background: rgba(0,0,0,0.38);
+  margin-top: 2.5rem;
+  border-radius: 22px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  padding: 2.5rem 2.5rem 3.5rem 2.5rem;
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+}
+
+.prediction-title {
+  color: #fff;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 2.2rem;
+  text-align: center;
+}
+
+.prediction-form .ant-form-item-label > label {
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.prediction-btn-row {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.prediction-btn {
+  background: #f44336 !important;
+  border: none !important;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  height: 52px;
+  letter-spacing: 2px;
+}
+
+.prediction-btn:hover {
+  background: #d32f2f !important;
+}
+
+.prediction-character {
+  position: absolute;
+  left: 0;
+  bottom: -60px;
+  height: 160px;
+  z-index: 2;
+} 

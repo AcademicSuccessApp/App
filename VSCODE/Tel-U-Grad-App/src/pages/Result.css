@@ -1,0 +1,81 @@
+.result-container {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.result-card {
+  max-width: 800px;
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.result-title {
+  text-align: center;
+  margin-bottom: 2rem !important;
+  color: #1a1a1a;
+}
+
+.result-progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.result-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.result-details {
+  background: #fafafa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.result-details .ant-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.result-recommendation {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid #f0f0f0;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.result-actions .ant-btn {
+  min-width: 200px;
+  height: 48px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .result-progress {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .result-details .ant-col {
+    width: 100%;
+  }
+} 

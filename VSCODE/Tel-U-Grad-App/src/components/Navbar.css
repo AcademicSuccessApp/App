@@ -1,0 +1,48 @@
+.navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 0 2.5rem;
+  height: 90px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-logo img {
+  height: 60px;
+  margin-right: 2rem;
+}
+
+.navbar-menu {
+  flex: 1;
+  min-width: 400px;
+  background: transparent !important;
+  border-bottom: none !important;
+  font-size: 1.08rem;
+  display: flex;
+  justify-content: center;
+}
+
+.navbar-contact {
+  margin-left: 2rem;
+}
+
+.contact-btn {
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  border: 1.5px solid #222;
+  background: #fff;
+  color: #222;
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.04);
+  transition: all 0.2s;
+}
+
+.contact-btn:hover {
+  background: #f44336;
+  color: #fff;
+  border-color: #f44336;
+} 
