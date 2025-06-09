@@ -7,13 +7,14 @@ export async function predictGraduation(data) {
       sem1: data.sem1,
       sem2: data.sem2,
       sem3: data.sem3,
-      programStudi: data.programStudi,
-      kodeDosen: data.kodeDosen
+      sem4: data.sem4,
+      gender: data.gender,
+      programStudi: data.programStudi
     });
     
-  return {
-      probability: response.data.probability,
-      status: response.data.status,
+    return {
+      classification: response.data.classification,
+      regression: response.data.regression,
       recommendation: response.data.recommendation
     };
   } catch (error) {

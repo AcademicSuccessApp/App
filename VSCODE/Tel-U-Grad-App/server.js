@@ -19,7 +19,18 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 app.post('/api/predict', async (req, res) => {
   try {
-    const { sem1, sem2, sem3, programStudi, kodeDosen } = req.body;
+    const { sem1, sem2, sem3, sem4, gender, programStudi } = req.body;
+    
+    // Log the received data
+    console.log('Received prediction request with data:', {
+      sem1, sem2, sem3, sem4, gender, programStudi
+    });
+
+    // Validate input data
+    if (!sem1 || !sem2 || !sem3 || !sem4 || !gender || !programStudi) {
+      console.error('Missing required fields:', { sem1, sem2, sem3, sem4, gender, programStudi });
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
 
     // Spawn Python process
     const pythonProcess = spawn('python', [
@@ -27,8 +38,9 @@ app.post('/api/predict', async (req, res) => {
       sem1,
       sem2,
       sem3,
-      programStudi,
-      kodeDosen
+      sem4,
+      gender,
+      programStudi
     ]);
 
     let predictionResult = '';
@@ -36,30 +48,44 @@ app.post('/api/predict', async (req, res) => {
 
     pythonProcess.stdout.on('data', (data) => {
       predictionResult += data.toString();
+      console.log('Python stdout:', data.toString());
     });
 
     pythonProcess.stderr.on('data', (data) => {
       errorOutput += data.toString();
+      console.error('Python stderr:', data.toString());
     });
 
     pythonProcess.on('close', (code) => {
       if (code !== 0) {
         console.error(`Python process exited with code ${code}`);
-        console.error(errorOutput);
-        return res.status(500).json({ error: 'Prediction failed' });
+        console.error('Error output:', errorOutput);
+        return res.status(500).json({ 
+          error: 'Prediction failed',
+          details: errorOutput
+        });
       }
 
       try {
+        console.log('Raw prediction result:', predictionResult);
         const result = JSON.parse(predictionResult);
         res.json(result);
       } catch (error) {
         console.error('Failed to parse prediction result:', error);
-        res.status(500).json({ error: 'Invalid prediction result' });
+        console.error('Raw prediction result:', predictionResult);
+        res.status(500).json({ 
+          error: 'Invalid prediction result',
+          details: error.message,
+          rawResult: predictionResult
+        });
       }
     });
   } catch (error) {
     console.error('Prediction error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message
+    });
   }
 });
 

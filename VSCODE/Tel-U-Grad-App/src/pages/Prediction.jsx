@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, InputNumber, Select, Button, Row, Col, message, Spin } from 'antd';
+import { Form, InputNumber, Select, Button, Row, Col, message, Spin, Radio } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { predictGraduation } from '../api/prediction';
 import graduateCharacter from '../assets/Graduate Character.png';
@@ -8,33 +8,42 @@ import './Prediction.css';
 
 const { Option } = Select;
 
-const programStudiOptions = [
+const programStudiDisplayMap = [
+  { display: 'D3 Teknik Telekomunikasi', value: 'D3 Teknik Telekomunikasi' },
+  { display: 'S1 Teknik Telekomunikasi', value: 'S1 Teknik Telekomunikasi' },
+  { display: 'S1 Teknik Elektro', value: 'S1 Teknik Elektro' },
+  { display: 'S1 Teknik Biomedis', value: 'S1 Teknik Biomedis' },
+  { display: 'S1 Teknologi Pangan', value: 'S1 Teknologi Pangan' },
+  { display: 'S1 Bisnis Digital', value: 'S1 Bisnis Digital' },
+  { display: 'S1 Desain Komunikasi Visual', value: 'S1 Desain Komunikasi Visual' },
+  { display: 'S1 Teknik Industri', value: 'S1 Teknik Industri' },
+  { display: 'S1 Teknik Logistik', value: 'S1 Teknik Logistik' },
+  { display: 'S1 Desain Produk', value: 'S1 Desain Produk' },
+  { display: 'S1 Teknik Informatika', value: 'S1 Teknik Informatika - Kampus Purwokerto' },
+  { display: 'S1 Sains Data', value: 'S1 Sains Data - Kampus Purwokerto' },
+  { display: 'S1 Rekayasa Perangkat Lunak', value: 'S1 Rekayasa Perangkat Lunak - Kampus Purwokerto' },
+  { display: 'S1 Sistem Informasi', value: 'S1 Sistem Informasi - Kampus Purwokerto' }
+];
+const originalProgramStudi = [
   'S1 Teknik Informatika - Kampus Purwokerto',
   'S1 Sistem Informasi - Kampus Purwokerto',
   'S1 Rekayasa Perangkat Lunak - Kampus Purwokerto',
   'S1 Sains Data - Kampus Purwokerto'
 ];
 
-const kodeDosenOptions = [
-  'ANT', 'YRF', 'IQK', 'MLU', 'CPR', 'DAP', 'DSA', 'SDN', 'WAA', 'PRX', 'MAL', 'DCF',
-  'NAP', 'AIZ', 'UMT', 'THX', 'ADN', 'ABD', 'ADO', 'YAK', 'ABX', 'MPT', 'TWR', 'SDX',
-  'AGI', 'MFI', 'NAY', 'APT', 'WAX', 'TGL', 'FMW', 'ARI', 'IPA', 'EII', 'AWD', 'IST',
-  'AJU', 'MZN', 'DSP', 'RDR', 'STX', 'RDN', 'EUA', 'FDD', 'DWA', 'RSY', 'SFR', 'MYK',
-  'HWU', 'SWX', 'CRA', 'KMN', 'YDO', 'SAT', 'DJA', 'YUH', 'DYX', 'CWA', 'AAH', 'ARB',
-  'GFA', 'AJS', 'NGN', 'NAR', 'ACW', 'AWT', 'RAD', 'CKO', 'SIK'
-];
-
 const initialValues = {
   sem1: 3.0,
   sem2: 3.0,
   sem3: 3.0,
-  programStudi: programStudiOptions[0],
-  kodeDosen: kodeDosenOptions[0]
+  sem4: 3.0,
+  gender: 'Laki-laki',
+  programStudi: programStudiDisplayMap[0].value
 };
 
 const Prediction = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [selectedProgram, setSelectedProgram] = useState(programStudiDisplayMap[0].value);
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -81,30 +90,41 @@ const Prediction = () => {
               >
                 <InputNumber min={0} max={4} step={0.01} style={{ width: '100%' }} />
               </Form.Item>
+              <Form.Item 
+                label="Semester 4 IPS" 
+                name="sem4" 
+                rules={[{ required: true, message: 'Please input your Semester 4 IPS' }]}
+              >
+                <InputNumber min={0} max={4} step={0.01} style={{ width: '100%' }} />
+              </Form.Item>
             </Col>
             <Col xs={24} md={12}>
+              <Form.Item 
+                label="Gender" 
+                name="gender" 
+                rules={[{ required: true, message: 'Please select your gender' }]}
+              >
+                <Radio.Group>
+                  <Radio value="Laki-laki">Laki-laki</Radio>
+                  <Radio value="Perempuan">Perempuan</Radio>
+                </Radio.Group>
+              </Form.Item>
               <Form.Item 
                 label="Program Studi" 
                 name="programStudi" 
                 rules={[{ required: true, message: 'Please select your Program Studi' }]}
               >
-                <Select>
-                  {programStudiOptions.map(option => (
-                    <Option key={option} value={option}>{option}</Option>
+                <Select onChange={value => setSelectedProgram(value)}>
+                  {programStudiDisplayMap.map(option => (
+                    <Option key={option.value} value={option.value}>{option.display}</Option>
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item 
-                label="Kode Dosen" 
-                name="kodeDosen" 
-                rules={[{ required: true, message: 'Please select your Dosen Wali' }]}
-              >
-                <Select>
-                  {kodeDosenOptions.map(option => (
-                    <Option key={option} value={option}>{option}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
+              {!originalProgramStudi.includes(selectedProgram) && (
+                <div style={{ fontSize: '0.75rem', color: '#888', marginTop: -12, marginBottom: 12 }}>
+                  Prediksi untuk program studi ini menggunakan model generalisasi dari S1 Rekayasa Perangkat Lunak.
+                </div>
+              )}
             </Col>
           </Row>
           <div className="prediction-btn-row">
