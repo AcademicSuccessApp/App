@@ -11,7 +11,7 @@ export async function predictGraduation(data) {
       kodeDosen: data.kodeDosen
     });
     
-    return {
+  return {
       probability: response.data.probability,
       status: response.data.status,
       recommendation: response.data.recommendation

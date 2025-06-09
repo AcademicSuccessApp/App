@@ -25,7 +25,7 @@ const Result = () => {
     );
   }
 
-  const isLikelyToGraduate = status === 'Likely to Graduate';
+  const isLikelyToGraduate = status === 'Likely to Graduate on Time';
 
   return (
     <div className="result-container">
@@ -93,4 +93,4 @@ const Result = () => {
   );
 };
 
-export default Result;  
+export default Result; 

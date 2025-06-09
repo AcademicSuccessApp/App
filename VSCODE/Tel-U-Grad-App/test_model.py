@@ -29,20 +29,7 @@ X = df[feature_cols]
 
 # Predict
 prediction = model.predict(X)[0]
-if hasattr(model, "predict_proba"):
-    proba = model.predict_proba(X)[0]
-    prob_likely = float(proba[1])  # Probability for class 1
-else:
-    prob_likely = None
-
-# Prepare response
-result = {
-    'status': 'Likely to Graduate' if prediction == 1 else 'At Risk',
-    'probability': prob_likely,
-    'recommendation': get_recommendation(prediction, data)
-}
-
-print("Prediction (1=Likely to Graduate, 0=At Risk):", prediction)
+print("Prediction (1=Likely to Graduate on Time, 0=At Risk to Graduate Late):", prediction)
 
 # If you want to see the probability (optional, for debugging)
 if hasattr(model, "predict_proba"):

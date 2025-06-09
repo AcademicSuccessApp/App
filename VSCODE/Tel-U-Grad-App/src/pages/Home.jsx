@@ -17,7 +17,7 @@ const Home = () => {
           className="home-btn"
           onClick={() => navigate('/services')}
         >
-          View Services
+          Get Started
         </Button>
       </div>
     </div>

@@ -9,7 +9,7 @@ const Services = () => {
   return (
     <div className="services-container">
       <div className="services-header">
-        <span className="services-prediction-label">STREAMLINDES PREDICTIONS</span>
+        <span className="services-prediction-label">Graduate Prediction</span>
         <h2 className="services-title">Effortlessly assess your graduation chances</h2>
       </div>
       <Row gutter={32} justify="center">

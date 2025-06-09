@@ -42,7 +42,7 @@ def predict(sem1, sem2, sem3, program_studi, kode_dosen):
 
         # Prepare response
         result = {
-            'status': 'Likely to Graduate' if prediction == 1 else 'At Risk',
+            'status': 'Likely to Graduate on Time' if prediction == 1 else 'At Risk to Graduate Late',
             'probability': prob_pred,
             'recommendation': get_recommendation(prediction, data)
         }

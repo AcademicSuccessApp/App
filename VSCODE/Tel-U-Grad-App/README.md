@@ -17,7 +17,7 @@
    - Weighted prediction model
    - Multiple factor analysis
    - Real-time prediction results
-   - Status classification (Likely to Graduate/At Risk)
+   - Status classification (Likely to Graduate on Time/At Risk to Graduate Late)
 
 3. **Visualization Dashboard**
    - Performance metrics visualization

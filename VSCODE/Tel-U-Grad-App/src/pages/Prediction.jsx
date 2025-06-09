@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, InputNumber, Select, Button, Row, Col, message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { predictGraduation } from '../api/prediction';
-import character from '../assets/character.jpg';
+import graduateCharacter from '../assets/Graduate Character.png';
 import bg from '../assets/bg.jpg';
 import './Prediction.css';
 
@@ -113,7 +113,7 @@ const Prediction = () => {
             </Button>
           </div>
         </Form>
-        <img src={character} alt="Character" className="prediction-character" />
+        <img src={graduateCharacter} alt="Graduate Character" className="prediction-character" />
       </div>
     </div>
   );

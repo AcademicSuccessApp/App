@@ -7,7 +7,7 @@ const About = () => {
         About
       </h2>
       <p style={{ color: '#888', fontSize: '1.1rem' }}>
-        (About page content will be implemented here, matching the Figma design)
+        (Aplikasi ini dibuat khusus untuk Mahasiswa Telkom University Purwokerto. Dengan aplikasi ini, mahasiswa dapat memprediksi peluang kelulusan berdasarkan data akademik mereka secara mudah dan cepat. Tujuan utama aplikasi ini adalah membantu mahasiswa dalam merencanakan studi dan mencapai kelulusan tepat waktu.)
       </p>
     </div>
   );
