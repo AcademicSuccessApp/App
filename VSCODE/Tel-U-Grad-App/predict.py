@@ -114,41 +114,43 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
         print(f"DEBUG: all_ips_perfect={all_ips_perfect}", file=sys.stderr)
 
         if all_ips_perfect:
-            if mapped_program_studi == 'D3 Teknik Telekomunikasi':
+            # Use the original program_studi for this logic branch
+            if program_studi == 'D3 Teknik Telekomunikasi': # Check original program_studi
                 regression_pred = 6.0
-                print(f"DEBUG: Perfect IPS, D3, setting regression_pred={regression_pred}", file=sys.stderr)
+                print(f"DEBUG: Perfect IPS, D3 (original), setting regression_pred={regression_pred}", file=sys.stderr)
             else:
                 regression_pred = 7.0 # Fastest for S1
-                print(f"DEBUG: Perfect IPS, S1, setting regression_pred={regression_pred}", file=sys.stderr)
+                print(f"DEBUG: Perfect IPS, S1 (original), setting regression_pred={regression_pred}", file=sys.stderr)
             classification_pred = 1 # Force to 'Likely to Graduate on Time'
             classification_proba = np.array([0.0, 1.0]) # Assume 100% confidence for class 1
             print(f"DEBUG: Perfect IPS, forcing classification_pred={classification_pred}, classification_proba={classification_proba}", file=sys.stderr)
 
         # Adjust regression prediction based on program type and classification
-        if mapped_program_studi == 'D3 Teknik Telekomunikasi':
-            print(f"DEBUG: Entering D3-specific adjustment. Current regression_pred={regression_pred}", file=sys.stderr)
+        # Use the original program_studi for this logic branch
+        if program_studi == 'D3 Teknik Telekomunikasi': # Check original program_studi
+            print(f"DEBUG: Entering D3-specific adjustment (original). Current regression_pred={regression_pred}", file=sys.stderr)
             # Apply reduction for D3 programs first (only if not already set by perfect IPS condition)
             if not all_ips_perfect:
                 regression_pred = regression_pred - 2
-                print(f"DEBUG: D3 not perfect IPS, reduced regression_pred={regression_pred}", file=sys.stderr)
+                print(f"DEBUG: D3 (original) not perfect IPS, reduced regression_pred={regression_pred}", file=sys.stderr)
 
             if classification_pred == 1:  # D3 and On Time
                 if regression_pred != 6: # Check if it was already set to 6 by perfect IPS
                     regression_pred = 6 # Force to 6 semesters
-                    print(f"DEBUG: D3 On Time, forced regression_pred={regression_pred}", file=sys.stderr)
+                    print(f"DEBUG: D3 (original) On Time, forced regression_pred={regression_pred}", file=sys.stderr)
             else: # D3 and At Risk to Graduate Late
                 # Cap D3 At Risk students between 6 and 10 semesters
                 regression_pred = min(max(regression_pred, 6), 10)
-                print(f"DEBUG: D3 At Risk, capped regression_pred={regression_pred}", file=sys.stderr)
-        else: # S1 Programs
-            print(f"DEBUG: Entering S1-specific adjustment. Current regression_pred={regression_pred}", file=sys.stderr)
+                print(f"DEBUG: D3 (original) At Risk, capped regression_pred={regression_pred}", file=sys.stderr)
+        else: # S1 Programs (or other non-D3)
+            print(f"DEBUG: Entering S1-specific adjustment (original). Current regression_pred={regression_pred}", file=sys.stderr)
             if classification_pred == 1:  # S1 and On Time
                 # S1 programs capped between 7 and 8 (only if not already set by perfect IPS condition)
                 if not all_ips_perfect:
                     regression_pred = min(max(regression_pred, 7), 8)
-                    print(f"DEBUG: S1 On Time, not perfect IPS, capped regression_pred={regression_pred}", file=sys.stderr)
+                    print(f"DEBUG: S1 (original) On Time, not perfect IPS, capped regression_pred={regression_pred}", file=sys.stderr)
             else: # S1 and At Risk to Graduate Late
-                print(f"DEBUG: S1 At Risk, using model prediction as is.", file=sys.stderr)
+                print(f"DEBUG: S1 (original) At Risk, using model prediction as is.", file=sys.stderr)
 
         print(f"DEBUG: Final regression_pred={regression_pred}", file=sys.stderr)
         # Prepare response
