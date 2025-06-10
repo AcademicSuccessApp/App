@@ -98,11 +98,22 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
 
         # Make regression prediction
         regression_pred = regression_model.predict(X_regression)[0]
-        
+
+        # Special condition: If all IPS are 4.0, predict fastest graduation
+        all_ips_perfect = all(val == 4.0 for val in processed_semesters.values())
+        if all_ips_perfect:
+            if mapped_program_studi == 'D3 Teknik Telekomunikasi':
+                regression_pred = 6.0
+            else:
+                regression_pred = 7.0 # Fastest for S1
+            classification_pred = 1 # Force to 'Likely to Graduate on Time'
+            classification_proba = np.array([0.0, 1.0]) # Assume 100% confidence for class 1
+
         # Adjust regression prediction based on program type and classification
         if mapped_program_studi == 'D3 Teknik Telekomunikasi':
-            # Apply reduction for D3 programs first
-            regression_pred = regression_pred - 2
+            # Apply reduction for D3 programs first (only if not already set by perfect IPS condition)
+            if not all_ips_perfect:
+                regression_pred = regression_pred - 2
 
             if classification_pred == 1:  # D3 and On Time
                 regression_pred = 6 # Force to 6 semesters
@@ -111,8 +122,9 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
                 regression_pred = min(max(regression_pred, 6), 10)
         else: # S1 Programs
             if classification_pred == 1:  # S1 and On Time
-                # S1 programs capped between 7 and 8
-                regression_pred = min(max(regression_pred, 7), 8)
+                # S1 programs capped between 7 and 8 (only if not already set by perfect IPS condition)
+                if not all_ips_perfect:
+                    regression_pred = min(max(regression_pred, 7), 8)
             # else: # S1 and At Risk to Graduate Late
                 # For S1 At Risk, no specific cap, use model's prediction as is
                 # (This is implicitly handled by not having an 'else' block here)
