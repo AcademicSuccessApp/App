@@ -105,8 +105,8 @@ const Prediction = () => {
                 rules={[{ required: true, message: 'Please select your gender' }]}
               >
                 <Radio.Group>
-                  <Radio value="Laki-laki">Laki-laki</Radio>
-                  <Radio value="Perempuan">Perempuan</Radio>
+                  <Radio value="Laki-laki" style={{ color: 'white' }}>Laki-laki</Radio>
+                  <Radio value="Perempuan" style={{ color: 'white' }}>Perempuan</Radio>
                 </Radio.Group>
               </Form.Item>
               <Form.Item 

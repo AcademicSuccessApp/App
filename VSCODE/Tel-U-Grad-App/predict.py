@@ -7,6 +7,8 @@ import traceback
 
 def predict(sem1, sem2, sem3, sem4, gender, program_studi):
     try:
+        print(f"DEBUG: Received inputs - sem1={sem1}, sem2={sem2}, sem3={sem3}, sem4={sem4}, gender={gender}, program_studi={program_studi}", file=sys.stderr)
+
         # Input validation and processing for semesters
         sem_values = []
         processed_semesters = {}
@@ -35,6 +37,7 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
         for sem_key in ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']:
             if processed_semesters[sem_key] is None:
                 processed_semesters[sem_key] = rata2_IPS
+        print(f"DEBUG: processed_semesters={processed_semesters}, rata2_IPS={rata2_IPS}", file=sys.stderr)
 
         if gender.lower() not in ['laki-laki', 'perempuan']:
             raise ValueError(f"Invalid gender: {gender}. Must be 'Laki-laki' or 'Perempuan'")
@@ -63,6 +66,7 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
             mapped_program_studi = 'S1 Rekayasa Perangkat Lunak - Kampus Purwokerto'
         else:
             mapped_program_studi = program_studi
+        print(f"DEBUG: mapped_program_studi={mapped_program_studi}", file=sys.stderr)
 
         # Create input data
         data = {
@@ -77,58 +81,76 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
 
         # Convert to DataFrame
         df = pd.DataFrame([data])
+        print(f"DEBUG: DataFrame before encoding=\n{df}", file=sys.stderr)
 
         try:
             # Apply label encoding for program studi
             df['program_studi_le'] = le_program_studi.transform(df['program_studi'].astype(str))
         except Exception as e:
             raise ValueError(f"Invalid program studi: {program_studi}") from e
+        print(f"DEBUG: DataFrame after encoding=\n{df}", file=sys.stderr)
 
         # Prepare features for classification (no scaling)
         classification_features = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'rata2_IPS', 'predicted_gender', 'program_studi_le']
         X_classification = df[classification_features]
+        print(f"DEBUG: X_classification=\n{X_classification}", file=sys.stderr)
 
         # Make classification prediction
         classification_pred = classification_model.predict(X_classification)[0]
         classification_proba = classification_model.predict_proba(X_classification)[0]
+        print(f"DEBUG: classification_pred={classification_pred}, classification_proba={classification_proba}", file=sys.stderr)
 
         # Prepare features for regression (without scaling)
         regression_features = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'rata2_IPS', 'predicted_gender', 'program_studi_le']
         X_regression = df[regression_features]
+        print(f"DEBUG: X_regression=\n{X_regression}", file=sys.stderr)
 
         # Make regression prediction
         regression_pred = regression_model.predict(X_regression)[0]
-
+        print(f"DEBUG: raw regression_pred={regression_pred}", file=sys.stderr)
+        
         # Special condition: If all IPS are 4.0, predict fastest graduation
         all_ips_perfect = all(val == 4.0 for val in processed_semesters.values())
+        print(f"DEBUG: all_ips_perfect={all_ips_perfect}", file=sys.stderr)
+
         if all_ips_perfect:
             if mapped_program_studi == 'D3 Teknik Telekomunikasi':
                 regression_pred = 6.0
+                print(f"DEBUG: Perfect IPS, D3, setting regression_pred={regression_pred}", file=sys.stderr)
             else:
                 regression_pred = 7.0 # Fastest for S1
+                print(f"DEBUG: Perfect IPS, S1, setting regression_pred={regression_pred}", file=sys.stderr)
             classification_pred = 1 # Force to 'Likely to Graduate on Time'
             classification_proba = np.array([0.0, 1.0]) # Assume 100% confidence for class 1
+            print(f"DEBUG: Perfect IPS, forcing classification_pred={classification_pred}, classification_proba={classification_proba}", file=sys.stderr)
 
         # Adjust regression prediction based on program type and classification
         if mapped_program_studi == 'D3 Teknik Telekomunikasi':
+            print(f"DEBUG: Entering D3-specific adjustment. Current regression_pred={regression_pred}", file=sys.stderr)
             # Apply reduction for D3 programs first (only if not already set by perfect IPS condition)
             if not all_ips_perfect:
                 regression_pred = regression_pred - 2
+                print(f"DEBUG: D3 not perfect IPS, reduced regression_pred={regression_pred}", file=sys.stderr)
 
             if classification_pred == 1:  # D3 and On Time
-                regression_pred = 6 # Force to 6 semesters
+                if regression_pred != 6: # Check if it was already set to 6 by perfect IPS
+                    regression_pred = 6 # Force to 6 semesters
+                    print(f"DEBUG: D3 On Time, forced regression_pred={regression_pred}", file=sys.stderr)
             else: # D3 and At Risk to Graduate Late
                 # Cap D3 At Risk students between 6 and 10 semesters
                 regression_pred = min(max(regression_pred, 6), 10)
+                print(f"DEBUG: D3 At Risk, capped regression_pred={regression_pred}", file=sys.stderr)
         else: # S1 Programs
+            print(f"DEBUG: Entering S1-specific adjustment. Current regression_pred={regression_pred}", file=sys.stderr)
             if classification_pred == 1:  # S1 and On Time
                 # S1 programs capped between 7 and 8 (only if not already set by perfect IPS condition)
                 if not all_ips_perfect:
                     regression_pred = min(max(regression_pred, 7), 8)
-            # else: # S1 and At Risk to Graduate Late
-                # For S1 At Risk, no specific cap, use model's prediction as is
-                # (This is implicitly handled by not having an 'else' block here)
+                    print(f"DEBUG: S1 On Time, not perfect IPS, capped regression_pred={regression_pred}", file=sys.stderr)
+            else: # S1 and At Risk to Graduate Late
+                print(f"DEBUG: S1 At Risk, using model prediction as is.", file=sys.stderr)
 
+        print(f"DEBUG: Final regression_pred={regression_pred}", file=sys.stderr)
         # Prepare response
         result = {
             'classification': {
