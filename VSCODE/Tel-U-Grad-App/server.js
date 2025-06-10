@@ -12,10 +12,12 @@ const port = process.env.PORT || 5173;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'dist')));
+// Serve static files from the public directory (for models, etc.)
+app.use(express.static(path.resolve(__dirname, 'public')));
+
+// Serve the React static build files
+app.use(express.static(path.resolve(__dirname, 'dist')));
 
 app.post('/api/predict', async (req, res) => {
   try {
@@ -90,9 +92,9 @@ app.post('/api/predict', async (req, res) => {
 });
 
 // The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
+// match one above, send back React's index.html file from the dist folder.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
 });
 
 app.listen(port, () => {
