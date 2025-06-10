@@ -7,14 +7,34 @@ import traceback
 
 def predict(sem1, sem2, sem3, sem4, gender, program_studi):
     try:
-        # Input validation
-        for sem in [sem1, sem2, sem3, sem4]:
-            try:
-                sem_float = float(sem)
-                if not (0 <= sem_float <= 4):
-                    raise ValueError(f"GPA must be between 0 and 4, got {sem_float}")
-            except ValueError as e:
-                raise ValueError(f"Invalid GPA value: {sem}") from e
+        # Input validation and processing for semesters
+        sem_values = []
+        processed_semesters = {}
+        for i, sem_arg in enumerate([sem1, sem2, sem3, sem4]):
+            sem_num = i + 1
+            if sem_arg is None or sem_arg == '':
+                processed_semesters[f'Sem {sem_num}'] = None # Mark as missing
+            else:
+                try:
+                    sem_float = float(sem_arg)
+                    if not (0 <= sem_float <= 4):
+                        raise ValueError(f"Semester {sem_num} GPA must be between 0 and 4, got {sem_float}")
+                    processed_semesters[f'Sem {sem_num}'] = sem_float
+                    sem_values.append(sem_float)
+                except ValueError as e:
+                    raise ValueError(f"Invalid GPA value for Semester {sem_num}: {sem_arg}") from e
+
+        # Calculate rata2_IPS and impute missing semester values
+        if sem_values:
+            rata2_IPS = sum(sem_values) / len(sem_values)
+        else:
+            # Default if no semesters are provided
+            rata2_IPS = 3.0
+
+        # Impute missing semesters with calculated rata2_IPS or default if no semesters were provided
+        for sem_key in ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']:
+            if processed_semesters[sem_key] is None:
+                processed_semesters[sem_key] = rata2_IPS
 
         if gender.lower() not in ['laki-laki', 'perempuan']:
             raise ValueError(f"Invalid gender: {gender}. Must be 'Laki-laki' or 'Perempuan'")
@@ -29,9 +49,6 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
 
         # Convert gender to binary
         gender_binary = 1 if gender.lower() == 'perempuan' else 0
-
-        # Calculate average GPA
-        rata2_IPS = (float(sem1) + float(sem2) + float(sem3) + float(sem4)) / 4
 
         # List of original 4 program studi
         original_programs = [
@@ -49,10 +66,10 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
 
         # Create input data
         data = {
-            'Sem 1': float(sem1),
-            'Sem 2': float(sem2),
-            'Sem 3': float(sem3),
-            'Sem 4': float(sem4),
+            'Sem 1': processed_semesters['Sem 1'],
+            'Sem 2': processed_semesters['Sem 2'],
+            'Sem 3': processed_semesters['Sem 3'],
+            'Sem 4': processed_semesters['Sem 4'],
             'rata2_IPS': rata2_IPS,
             'predicted_gender': gender_binary,
             'program_studi': mapped_program_studi
@@ -82,9 +99,23 @@ def predict(sem1, sem2, sem3, sem4, gender, program_studi):
         # Make regression prediction
         regression_pred = regression_model.predict(X_regression)[0]
         
-        # If classification predicts on time, cap regression prediction between 7 and 8
-        if classification_pred == 1:  # On time
-            regression_pred = min(max(regression_pred, 7), 8)
+        # Adjust regression prediction based on program type and classification
+        if mapped_program_studi == 'D3 Teknik Telekomunikasi':
+            # Apply reduction for D3 programs first
+            regression_pred = regression_pred - 2
+
+            if classification_pred == 1:  # D3 and On Time
+                regression_pred = 6 # Force to 6 semesters
+            else: # D3 and At Risk to Graduate Late
+                # Cap D3 At Risk students between 6 and 10 semesters
+                regression_pred = min(max(regression_pred, 6), 10)
+        else: # S1 Programs
+            if classification_pred == 1:  # S1 and On Time
+                # S1 programs capped between 7 and 8
+                regression_pred = min(max(regression_pred, 7), 8)
+            # else: # S1 and At Risk to Graduate Late
+                # For S1 At Risk, no specific cap, use model's prediction as is
+                # (This is implicitly handled by not having an 'else' block here)
 
         # Prepare response
         result = {

@@ -72,28 +72,28 @@ const Prediction = () => {
               <Form.Item 
                 label="Semester 1 IPS" 
                 name="sem1" 
-                rules={[{ required: true, message: 'Please input your Semester 1 IPS' }]}
+                // rules={[{ required: true, message: 'Please input your Semester 1 IPS' }]}
               >
                 <InputNumber min={0} max={4} step={0.01} style={{ width: '100%' }} />
               </Form.Item>
               <Form.Item 
                 label="Semester 2 IPS" 
                 name="sem2" 
-                rules={[{ required: true, message: 'Please input your Semester 2 IPS' }]}
+                // rules={[{ required: true, message: 'Please input your Semester 2 IPS' }]}
               >
                 <InputNumber min={0} max={4} step={0.01} style={{ width: '100%' }} />
               </Form.Item>
               <Form.Item 
                 label="Semester 3 IPS" 
                 name="sem3" 
-                rules={[{ required: true, message: 'Please input your Semester 3 IPS' }]}
+                // rules={[{ required: true, message: 'Please input your Semester 3 IPS' }]}
               >
                 <InputNumber min={0} max={4} step={0.01} style={{ width: '100%' }} />
               </Form.Item>
               <Form.Item 
                 label="Semester 4 IPS" 
                 name="sem4" 
-                rules={[{ required: true, message: 'Please input your Semester 4 IPS' }]}
+                // rules={[{ required: true, message: 'Please input your Semester 4 IPS' }]}
               >
                 <InputNumber min={0} max={4} step={0.01} style={{ width: '100%' }} />
               </Form.Item>
@@ -121,8 +121,14 @@ const Prediction = () => {
                 </Select>
               </Form.Item>
               {!originalProgramStudi.includes(selectedProgram) && (
-                <div style={{ fontSize: '0.75rem', color: '#888', marginTop: -12, marginBottom: 12 }}>
-                  Prediksi untuk program studi ini menggunakan model generalisasi dari S1 Rekayasa Perangkat Lunak.
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  marginTop: -12,
+                  marginBottom: 12
+                }}>
+                  Prediksi untuk program studi ini menggunakan model generalisasi dari 4 Program Studi: S1 Teknik Informatika, S1 Sistem Informasi, S1 Rekayasa Perangkat Lunak, dan S1 Sains Data, sehingga hasil prediksi tidak cukup akurat pada program studi lainnya.
                 </div>
               )}
             </Col>
